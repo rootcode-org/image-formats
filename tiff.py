@@ -4,7 +4,7 @@
 # For EXIF tags see http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html
 
 import datetime
-from filestream import FileStream
+from streams import FileStream
 
 
 class TIFF:

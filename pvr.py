@@ -3,8 +3,7 @@
 # PVR file format: http://cdn.imgtec.com/sdk-documentation/PVR+File+Format.Specification.pdf
 
 import io
-from filestream import FileStream
-from bytestream import ByteStream
+from streams import ByteStream, FileStream
 
 pixel_formats = {
     # Name, Bits per pixel, Min width, Min height

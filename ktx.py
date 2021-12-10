@@ -4,8 +4,7 @@
 
 import io
 import struct
-from filestream import FileStream
-from bytestream import ByteStream
+from streams import ByteStream, FileStream
 
 pixel_format_names = {
     0x8C92: 'ATC_RGB',

@@ -5,7 +5,7 @@
 import io
 import datetime
 import xml.etree.ElementTree as ET
-from filestream import FileStream
+from streams import FileStream
 
 
 class PNG:

@@ -11,7 +11,7 @@
 import io
 import sys
 import datetime
-from filestream import FileStream
+from streams import FileStream
 from tiff import TIFF
 
 

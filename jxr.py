@@ -3,8 +3,7 @@
 # For JXR format see https://www.itu.int/rec/T-REC-T.832-201906-I/en
 
 import io
-from filestream import FileStream
-from bytestream import ByteStream
+from streams import ByteStream, FileStream
 
 pixel_formats = {
     0x05: "BlackWhite",

@@ -3,7 +3,7 @@
 # For PSD format see https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/
 
 import io
-from filestream import FileStream
+from streams import FileStream
 
 
 class PSD:

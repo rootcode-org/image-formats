@@ -5,7 +5,7 @@
 
 import io
 import datetime
-from filestream import FileStream
+from streams import FileStream
 
 
 class AVI:

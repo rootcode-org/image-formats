@@ -8,8 +8,7 @@ import io
 import struct
 import datetime
 import xml.etree.ElementTree as ET
-from filestream import FileStream
-from bytestream import ByteStream
+from streams import ByteStream, FileStream
 from tiff import TIFF
 
 

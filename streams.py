@@ -1,9 +1,7 @@
 # Copyright is waived. No warranty is provided. Unrestricted use and modification is permitted.
 
-"""
-Base class for ByteStream, FileStream and SocketStream
-"""
-
+import os
+import io
 import struct
 
 
@@ -220,3 +218,137 @@ class Stream:
     def read_vluq_string(self):
         length = self.read_vluq()
         return self.read_string(length)
+
+    def read_utf16_string(self, num_chars):
+        value = self.read_u8_array(num_chars*2)
+        return value.decode("utf-16")
+
+    def read_nt_utf16_string(self):
+        output = bytearray()
+        value = self.read_utf16_string(1)
+        while value != 0:
+            output.append(value)
+            value = self.read_utf16_string(1)
+        return output
+
+
+class ByteStream(Stream):
+
+    SEEK_SET = 0
+    SEEK_CUR = 1
+    SEEK_END = 2
+
+    def __init__(self, endian=None):
+        Stream.__init__(self, endian)
+        self.data = bytearray()
+        self.read_position = 0        # position is used for read operations only
+        self.read_position_stack = []
+
+    def reset(self):
+        self.data = bytearray()
+        self.length = 0
+        self.read_position = 0
+        self.read_position_stack = []
+
+    def set_data(self, data, length=None):
+        self.data = bytearray(data)
+        if length:
+            self.length = length
+        else:
+            self.length = len(self.data)
+        self.read_position = 0
+
+    def get_data(self):
+        return self.data
+
+    # position is for read operations only; write operations append to the bytearray
+    def set_read_position(self, offset, whence=SEEK_SET):
+        if whence == ByteStream.SEEK_SET:
+            self.read_position = offset                 # offset must be zero or positive
+        elif whence == ByteStream.SEEK_CUR:
+            self.read_position += offset                # offset can be positive or negative
+        else:
+            self.read_position = self.length + offset   # offset must be negative
+
+    def get_read_position(self):
+        return self.read_position
+
+    def push_read_position(self, new_position):
+        current_position = self.get_read_position()
+        self.read_position_stack.append(current_position)
+        self.set_read_position(new_position)
+        return current_position
+
+    def pop_read_position(self):
+        self.set_read_position(self.read_position_stack.pop())
+
+    def is_eof(self):
+        return self.read_position == self.length
+
+    def write_u8(self, value):
+        self.data.append(value)
+        self.length += 1
+
+    def write_u8_array(self, data):
+        self.data += data
+        self.length += len(data)
+
+    def read_u8(self):
+        value = self.data[self.read_position]
+        self.read_position += 1
+        return value
+
+    def read_u8_array(self, length):
+        value = self.data[self.read_position:self.read_position + length]
+        self.read_position += length
+        return value
+
+
+class FileStream(Stream):
+
+    def __init__(self, file_name, mode, endian=None):
+        Stream.__init__(self, endian)
+        self.handle = io.open(file_name, mode)
+        self.length = os.path.getsize(file_name)
+        self.position_stack = []
+
+    def close(self):
+        self.handle.close()
+
+    def set_position(self, position, whence=io.SEEK_SET):
+        self.handle.seek(position, whence)
+
+    def get_position(self):
+        return self.handle.tell()
+
+    def push_position(self, new_position):
+        current_position = self.get_position()
+        self.position_stack.append(current_position)
+        self.set_position(new_position)
+        return current_position
+
+    def pop_position(self):
+        self.set_position(self.position_stack.pop())
+
+    def get_remaining(self):
+        return self.length - self.handle.tell()
+
+    def is_eof(self):
+        return self.handle.tell() == self.length
+
+    def write_u8(self, value):
+        self.handle.write(bytes([value]))
+        self.length += 1
+
+    def write_u8_array(self, data):
+        self.handle.write(data)
+        self.length += len(data)
+
+    def read_u8(self):
+        return ord(self.handle.read(1))
+
+    def read_u8_array(self, length):
+        return bytearray(self.handle.read(length))
+
+    def flush(self):
+        self.handle.flush()

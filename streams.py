@@ -122,6 +122,11 @@ class Stream:
         self.write_vluq(len(string_data))
         self.write_u8_array(string_data)
 
+    def write_name_list(self, names):
+        string = ",".join(names)
+        self.write_u32(len(string))
+        self.write_string(string)
+
     def read_u8(self):
         raise ("Virtual function")
 
@@ -233,6 +238,11 @@ class Stream:
             output.append(value)
             value = self.read_utf16_string(1)
         return output
+
+    def read_name_list(self):
+        string_length = self.read_u32()
+        names = self.read_string(string_length)
+        return names.split(",")
 
 
 class ByteStream(Stream):

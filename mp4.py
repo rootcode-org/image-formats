@@ -104,7 +104,7 @@ class MP4:
                     if item_type == 'Exif':
                         self.exif_id = item_id
                     else:
-                        self.stream.set_position(atom_size - 21, whence=io.SEEK_CUR)
+                        self.stream.set_position(atom_size - 21, io.SEEK_CUR)
                 else:
                     sys.exit('Unsupported INFE atom version')
 
